@@ -1,0 +1,206 @@
+<div class="container-fluid">
+    <div class="product-section">
+      <button class="btn btn-primary float-end m-4" (click)="openModal('add')">Add User</button>
+  
+      <table class="table table-striped">
+        <thead>
+          <tr style="text-align: center;">
+            <th>Sr.no</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>DOB</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Country</th>
+            <th>State</th>
+            <th>City</th>
+            <th>Education Title</th>
+            <th>Passing Year</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ user?.FirstName }}</td>
+            <td>{{ user?.LastName }}</td>
+            <td>{{ user?.DOB }}</td>
+            <td>{{ user?.UserCredential?.Email }}</td>
+            <td>{{ user?.UserCredential?.Mobile }}</td>
+            <td>{{ user?.UserAdresses?.[0]?.Country }}</td>
+            <td>{{ user?.UserAdresses?.[0]?.State }}</td>
+            <td>{{ user?.UserAdresses?.[0]?.City }}</td>
+            <td>{{ user?.UserEducationDetails?.[0]?.EducationTitle }}</td>
+            <td>{{ user?.UserEducationDetails?.[0]?.PassingYear }}</td>
+            <td>
+              <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <button type="button" class="btn btn-success" (click)="openModal('update', user.Id)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button type="button" class="btn btn-danger" (click)="deleteUser(user.Id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">{{currentAction==='add' ? 'Add User' : 'Update User'}}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="userForm">
+            <div class="row g-3">
+              <div class="col-xl-3 mb-3">
+                <label for="FirstName" class="form-label">First Name <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="FirstName" formControlName="FirstName">
+                <div *ngIf="userForm.controls['FirstName'].hasError('required') && userForm.controls['FirstName'].touched" class="text-danger">
+                  First Name Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="LastName" class="form-label">Last Name <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="LastName" formControlName="LastName">
+                <div *ngIf="userForm.controls['LastName'].hasError('required') && userForm.controls['LastName'].touched" class="text-danger">
+                  Last Name Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="DOB" class="form-label">DOB <span>*</span></label>
+                <input type="date" class="form-control form-control-lg" id="DOB" formControlName="DOB">
+                <div *ngIf="userForm.controls['DOB'].hasError('required') && userForm.controls['DOB'].touched" class="text-danger">
+                  Date Of Birth Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="UserTypeId" class="form-label">User Type Name <span>*</span></label>
+                <select class="form-control form-control-lg" id="UserTypeId" formControlName="UserTypeId">
+                  <option value="" disabled selected>Select User Type</option>
+                  <option *ngFor="let userType of userTypes" [value]="userType.Id">{{ userType.UserTypeName }}</option>
+                </select>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="Email" class="form-label">Email <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="Email" formControlName="Email">
+                <div *ngIf="userForm.controls['Email'].hasError('required') && userForm.controls['Email'].touched" class="text-danger">
+                  Email Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="Mobile" class="form-label">Mobile <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="Mobile" formControlName="Mobile">
+                <div *ngIf="userForm.controls['Mobile'].hasError('required') && userForm.controls['Mobile'].touched" class="text-danger">
+                  Mobile Number Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3" *ngIf="currentAction === 'add'">
+                <label for="Password" class="form-label">Password <span>*</span></label>
+                <input type="password" class="form-control form-control-lg" id="Password" formControlName="Password">
+                <div *ngIf="userForm.controls['Password'].hasError('required') && userForm.controls['Password'].touched" class="text-danger">
+                  Password Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="AddressLineOne" class="form-label">Address Line One <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="AddressLineOne" formControlName="AddressLineOne">
+                <div *ngIf="userForm.controls['AddressLineOne'].hasError('required') && userForm.controls['AddressLineOne'].touched" class="text-danger">
+                  AddressLineOne Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="AddressLineTwo" class="form-label">Address Line Two</label>
+                <input type="text" class="form-control form-control-lg" id="AddressLineTwo" formControlName="AddressLineTwo">
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="Country" class="form-label">Country <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="Country" formControlName="Country">
+                <div *ngIf="userForm.controls['Country'].hasError('required') && userForm.controls['Country'].touched" class="text-danger">
+                  Country Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="State" class="form-label">State <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="State" formControlName="State">
+                <div *ngIf="userForm.controls['State'].hasError('required') && userForm.controls['State'].touched" class="text-danger">
+                  State Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="City" class="form-label">City <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="City" formControlName="City">
+                <div *ngIf="userForm.controls['City'].hasError('required') && userForm.controls['City'].touched" class="text-danger">
+                  City Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="PostalCode" class="form-label">Postal Code <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="PostalCode" formControlName="PostalCode">
+                <div *ngIf="userForm.controls['PostalCode'].hasError('required') && userForm.controls['PostalCode'].touched" class="text-danger">
+                  Postal Code Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="EducationTitle" class="form-label">Education Title <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="EducationTitle" formControlName="EducationTitle">
+                <div *ngIf="userForm.controls['EducationTitle'].hasError('required') && userForm.controls['EducationTitle'].touched" class="text-danger">
+                  Education Title Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="Description" class="form-label">Description</label>
+                <input type="text" class="form-control form-control-lg" id="Description" formControlName="Description">
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="PassingYear" class="form-label">Passing Year <span>*</span></label>
+                <input type="text" class="form-control form-control-lg" id="PassingYear" formControlName="PassingYear">
+                <div *ngIf="userForm.controls['PassingYear'].hasError('required') && userForm.controls['PassingYear'].touched" class="text-danger">
+                  Passing Year Required
+                </div>
+              </div>
+              <div class="col-xl-3 mb-3">
+                <label for="RoleId" class="form-label">Role <span>*</span></label>
+                <select class="form-control form-control-lg" id="RoleId" formControlName="RoleId">
+                  <option value="" disabled selected>Select Role</option>
+                  <option *ngFor="let role of roles" [value]="role.Id">{{ role.Name }}</option>
+                </select>
+                <div *ngIf="userForm.controls['RoleId'].hasError('required') && userForm.controls['RoleId'].touched" class="text-danger">
+                  Role Required
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="addOrUpdateUser()" [disabled]="userForm.invalid">
+            {{ currentAction === 'add' ? 'Add User' : 'Update User' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 text-danger" id="exampleModalLabel">Delete</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-danger">Confirm to Delete User?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
